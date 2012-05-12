@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="1280" minHeight="720" viewSourceURL="srcview/index.html">
+	
+	<fx:Script source="source.as"/>
+	<fx:Script>
+		<![CDATA[
+			
+			// スタートボタンが押されたときのイベント
+			protected function button_start_clickHandler(event:MouseEvent):void
+			{
+				frameRate = 12;
+				if(!during_step) {
+					// ステップ実行中でなければ最初から始める
+					gameStart();
+				} else {
+					// ステップ実行中であれば続きから始める
+					// （タイマーをスタートさせるだけ）
+					// この時、ステップ実行モードを外す。
+					during_step = false;
+					timerStart();
+				}
+			}
+			
+			// ストップボタンが押されたときのイベント
+			protected function button_stop_clickHandler(event:MouseEvent):void
+			{
+				// ステップ実行モードを外し、タイマーを止める。
+				during_step = false;
+				timerStop();
+			}
+			
+			// ステップ実行ボタンが押されたときのイベント
+			protected function button_step_clickHandler(event:MouseEvent):void
+			{
+				// map == null つまり、まだスタートを一度も押されていないときには何もしない
+				if(map != null) {
+					// ステップ実行モードを有効にし、
+					// タイマーを止める。
+					during_step = true;
+					timerStop();
+					// 画面を1ターン進める。
+					update();
+				}
+			}
+			
+			// チェックボックスの値が変更されたときのイベント
+			protected function checkbox_auto_increase_clickHandler(event:MouseEvent):void
+			{
+				// 自動で増えるかどうかのモード設定をチェックボックスと同じにする
+				autoIncreaseMode = checkbox_auto_increase.selected;
+				// 自動で増えるかどうかは、
+				// autoIncreaseTimerからイベントが飛ばされるかどうかによって決定される。
+				// このタイマーが設定されるのはtimerStartメソッドの実行時であるため、
+				// タイマーを再起動することによって設定を反映している。
+				timerStop();
+				timerStart();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+	</fx:Declarations>
+	
+	<s:Button x="10" y="10" label="スタート" click="button_start_clickHandler(event)" id="button_start" width="80"/>
+	<mx:Image x="10" y="39" width="1260" height="673" id="image_table"/>
+	<s:Button x="98" y="10" label="ストップ" id="button_stop" click="button_stop_clickHandler(event)" width="80"/>
+	<s:Button x="186" y="10" label="ステップ実行" id="button_step" click="button_step_clickHandler(event)"/>
+	<s:CheckBox x="286" y="11" label="３分ごとに自動的に増やす" enabled="true" selected="true" id="checkbox_auto_increase" click="checkbox_auto_increase_clickHandler(event)"/>
+</s:Application>
